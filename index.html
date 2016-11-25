@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>upLoad</title>
+	<link rel="stylesheet" href="./main.css">
+</head>
+<body>
+
+	<div class="main">
+		<header>
+			<h2>upLoad</h2>
+		</header>
+
+		<section class="content">
+			<div class="dash ondrag">
+				<img src="./svg/files-lg.svg" alt="背景">
+				<h2>Drag files here to add them to your repository</h2>
+				<p>Or <span><a href="javascript:;">choose your files</a><input type="file" id="fileBox" multiple></span></p>
+			</div>
+
+		</section>
+		<section class="list">
+			<!-- 进行中的 -->
+			<div class="upLoadNow">
+				<p>Uploading 5 of 7 files</p>
+				<p>2</p>
+				<div class="jd"></div>
+			</div>
+			<!-- 已完成的 -->
+			<ul>
+				<li><i class="file"></i>11<i class="close"></i></li>
+			</ul>
+		</section>
+		<footer>
+			<a href="" class="commit">Commit changes</a><a href="" class="cancel">Cancel</a>
+		</footer>
+	</div>
+
+</body>
+	<script src="./main.js"></script>
+</html>
