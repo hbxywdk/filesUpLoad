@@ -21,20 +21,34 @@ body {
     border-radius: 3px;
     text-align: center;
     color: #666;
-    padding: 10px; }
-    .main .content .dash {
+    padding: 10px;
+    position: relative; }
+    .main .content form {
       height: 100%;
-      border: 5px dashed #fff; }
-      .main .content .dash img {
-        margin-top: 94px; }
+      width: 100%; }
+    .main .content .dash {
+      width: 100%;
+      height: 100%;
+      border: 5px dashed #fff;
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 10; }
       .main .content .dash.ondrag {
         border: 5px dashed #ccc; }
-      .main .content .dash a {
-        color: #4078c0;
-        text-decoration: none; }
-      .main .content .dash p span {
+    .main .content img {
+      margin-top: 94px; }
+    .main .content a {
+      color: #4078c0;
+      text-decoration: none; }
+    .main .content p {
+      z-index: 11;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%); }
+      .main .content p span {
         position: relative; }
-        .main .content .dash p span #fileBox {
+        .main .content p span #fileBox {
           width: 200px;
           height: 30px;
           outline: none;
@@ -47,7 +61,8 @@ body {
     border: 1px solid #e5e5e5;
     border-width: 0px 1px 1px 1px;
     height: 60px;
-    position: relative; }
+    position: relative;
+    display: none; }
     .main .list .upLoadNow p {
       line-height: 30px;
       font-size: 14px;
@@ -61,7 +76,7 @@ body {
       top: 0;
       left: 0;
       z-index: -1;
-      width: 100%; }
+      width: 0%; }
   .main .list ul {
     border: 1px solid #e5e5e5;
     border-width: 0 1px 0 1px; }
@@ -79,7 +94,7 @@ body {
         vertical-align: middle;
         margin-top: -3px;
         margin-right: 3px; }
-      .main .list ul li i.close {
+      .main .list ul li em.close {
         width: 12px;
         height: 16px;
         background: url(./svg/close.svg) no-repeat center;
