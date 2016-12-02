@@ -1,3 +1,8 @@
+/**
+ * [qst 获取DOM]
+ * @param  {[String]}
+ * @return {[DOM]}  
+ */
 function qst(ele){
 	return typeof ele!== 'string' ? '' : document.querySelector(ele);
 }
@@ -13,7 +18,8 @@ var content=qst('.content'),//拖拽主容器
 	file_name=qst('.file_name'),//正在读取的文件名
 	commit=qst('.commit'),//提交
 	listUl=qst('.list ul'),//ul
-	dataArr=[];//文件数组
+	dataArr=[],//文件数组
+	leiji=0;//文件累计
 
 /**
  * [createForm]
@@ -23,7 +29,7 @@ function createForm(file){
 	var len=file.length,j=0;
 	!function read(){
 		if (!window.FileReader) {alert('您的浏览器不支持文件读取');return;}
-		if (file[j].type=='') {alert('请拖入文件！');return;}//屏蔽type为 '' 的文件
+		if (file[j].type=='') {alert('请不要拖入这类文件！');return;}//屏蔽type为 '' 的文件
 
 		var reader = new FileReader(); //FileReader
 		reader.readAsBinaryString(file[j]);//读取成二进制文件
@@ -40,24 +46,19 @@ function createForm(file){
 		}
 		//单个文件读取完成
 		reader.onload=function(e){
-			//this.result.index=j;//
-			dataArr.push([j,this.result,file[j].name]);//（增加文件索引 文件二进制 文件名） 文件数组压入新文件
-			addList(file[j].name,j);//增加列表
-			//console.log(dataArr)
-
+			leiji++;
+			dataArr.push([leiji,this.result,file[j].name]);//（增加文件索引 文件二进制 文件名） 文件数组压入新文件
+			addList(file[j].name,leiji);//增加列表
 			if(j>=len-1) {
 				setTimeout(function(){
 					upLoadNow.style.display="none";
-				},1000);
+				},100);
 				input.outerHTML=input.outerHTML;//清空input
 				input=qst('#fileBox');//重新获取input
 				input.addEventListener('change',inputChange,false);//重新绑定
 				console.log(dataArr)
 			}
 			!(j>=len-1) && read(++j);
-			//console.log(this.result)//读到的结果
-			//document.write('<img src='+this.result+'>')
-
 		}
 	}()
 
@@ -74,7 +75,7 @@ function addList(fileName,j){//添加列表
 		li_i_1.className='file';
 		li_span.innerText=fileName;
 		li_i_2.className='close';
-		li_i_2.dataset.ind=(dataArr.length-1);//增加data-ind 删除时使用
+		li_i_2.dataset.ind=j;//增加data-ind 删除时使用
 		li_.appendChild(li_i_1);
 		li_.appendChild(li_span);
 		li_.appendChild(li_i_2);
@@ -86,20 +87,20 @@ function addList(fileName,j){//添加列表
  */
 function delFile(fileNum){
 	//console.log(fileNum)
-	dataArr.splice(fileNum,1);
-}
-listUl.addEventListener('click',function(e){
-	//console.log(e.target.nodeName.toLowerCase())
-	if ( e.target.nodeName.toLowerCase()=='em') {
-		console.log(e.target.dataset.ind)
-		delFile(e.target.dataset.ind);
+	//alert(fileNum)
+	for (var i = 0 , len=dataArr.length; i < len; i++) {
+		console.log('iiiii',i);
+		console.log(dataArr[1]);
+		if (dataArr[i][0] == fileNum) {
+			dataArr.splice(i,1);//删掉数组的元素
+			listUl.removeChild(listUl.querySelectorAll('li')[i]);
+			console.log(dataArr);
+			break;//删除成功退出循环
+		}
 	}
-	
-},false);
-
+}
 function _submit(){
-/*	var form=new FormData();
-	form.append('name',2);*/
+	if(!dataArr[0]) {alert('文件列表为空');return;}
 	var oReq = new XMLHttpRequest();
 	oReq.onreadystatechange = function(){
 	    if(oReq.readyState == 4 && oReq.status == 200){   
@@ -110,15 +111,14 @@ function _submit(){
 	    }  
 	}; 
 	oReq.open("POST", "./main.php");
+	oReq.setRequestHeader("Content-type","application/x-www-form-urlencoded");//请求头
 	oReq.upload.onprogress=function(e){
 			var jindu=(e.loaded/e.total).toFixed(2)*100+'%'
 			console.log( jindu )
 	}
-	oReq.send(dataArr);
+	oReq.send("data="+dataArr);
+	//console.log("data="+JSON.stringify(dataArr) )
 }
-
-commit.addEventListener('click',_submit,false)
-
 function inputChange(){
 	createForm(this.files)
 }
@@ -153,3 +153,10 @@ content.addEventListener('dragenter',function(e){ _dragenter(e) },false);
 content.addEventListener('dragover',function(e){ _dragover(e) },false);
 content.addEventListener('dragleave',function(e){ _dragleave(e) },false);
 content.addEventListener('drop',function(e){ _drop(e) },false);
+commit.addEventListener('click',_submit,false)
+listUl.addEventListener('click',function(e){
+	if ( e.target.nodeName.toLowerCase()=='em') {
+		delFile(e.target.dataset.ind);
+	}
+},false);
+
