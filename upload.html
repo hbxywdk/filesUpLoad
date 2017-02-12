@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>upload</title>
+</head>
+<style>
+	#red{
+		height: 10px;
+		background: red;
+		width: 0;
+	}
+</style>
+<body>
+	<input type="file" id="file" multiple="multiple">
+	<img src="" alt="" id="image">
+	<button id="btn">提交</button>
+	<button id="che">取消</button>
+	<h1 id="h"></h1>
+	<div id="red"></div>
+	
+</body>
+<script>
+/*新版本的XMLHttpRequest对象，传送数据的时候，有一个progress事件，用来返回进度信息。
+它分成上传和下载两种情况
+１）下载的progress事件属于XMLHttpRequest对象
+２）上传的progress事件属于XMLHttpRequest.upload对象。
+我 们先定义progress事件的回调函数。
+xhr.onprogress = updateProgress;
+xhr.upload.onprogress = updateProgress;
+然后，在回调函数里面，使用这个事件的一些属性。
+function updateProgress(event) {
+    if(event.lengthComputable) {
+        var percentComplete = event.loaded / event.total;
+    }
+}
+上面的代码中，event.total是需要传输的总字节，event.loaded是已经传输的字节。如果event.lengthComputable不为真，则event.total等于0。
+与progress事件相关的，还有其他五个事件，可以分别指定回调函数： 
+* load事件：传输成功完成。
+* abort事件：传输被用户取消。
+* error事件：传输中出现错误。
+* loadstart事件：传输开始。
+* loadEnd事件：传输结束，但是不知道成功还是失败。 */
+
+	var file=document.getElementById('file');
+	var image=document.getElementById('image');
+	var btn=document.getElementById('btn');
+	var h=document.getElementById('h');
+	var red=document.getElementById('red');
+	var che=document.getElementById('che');
+
+	//预览
+	file.onchange=function(){
+		//alert();
+		var allowExtention=".jpg.bmp.gif.png";//允许上传文件的后缀名
+
+		if(window.FileReader){
+			var reader = new FileReader();
+			var imgname=file.files[0].name;
+			var isImg=allowExtention.indexOf( imgname.slice(imgname.indexOf('.')) );
+
+			if (isImg!=-1) {
+			 	reader.onload = function(e){
+			 		e=e||event;
+	　　　　　　　　image.src = e.target.result;
+	　　　　　　　　image.width = 100;
+			 	}
+
+				reader.readAsDataURL(file.files[0]);
+			}else{
+				alert('请上传图片！');
+				file.value='';
+			}
+
+
+		}
+	}
+	//上传
+	btn.onclick=function(){
+		if (file.files[0]) {
+			if (window.FormData) {
+
+				var formData = new FormData();
+		　　　　// 建立一个upload表单项，值为上传的文件
+		　　　　formData.append('upload', file.files[0]);//(名字，文件内容)
+		　　　　var xhr = new XMLHttpRequest();
+
+				xhr.upload.addEventListener("progress", function(ev){
+		            if (ev.lengthComputable) {
+		                var percentComplete = Math.round(ev.loaded * 100 / ev.total);
+		                 h.innerHTML='上传中'+percentComplete+"%";
+		                 red.style.width=percentComplete+'%';
+		               
+		            }else {
+		                 h.innerHTML= '无法计算';
+		            }
+		        }, false);
+
+		　　　　xhr.open('POST', '127.0.0.1/html/cj/json.php');
+		　　　　// 定义上传完成后的回调函数
+		　　　　xhr.onload = function () {
+		　　　　　　if (xhr.status === 200) {
+		　　　　　　　　console.log('上传成功');
+		　　　　　　} else {
+		　　　　　　　　console.log('出错了');
+		　　　　　　}
+
+		　　　　};
+				che.onclick=function(){
+					xhr.abort();
+				};
+				setTimeout(function(){
+					xhr.abort();
+					console.log('请求超时');
+				},60000);
+				xhr.onabort=function(){
+					console.log('请求中断');
+				};
+				xhr.onerror=function(){
+					console.log('请求错误');
+				};
+		　　　　xhr.send(formData);
+
+
+			}
+		}
+	}
+</script>
+</html>
